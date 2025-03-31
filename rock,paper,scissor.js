@@ -1,5 +1,6 @@
 let Result = 0;  // Score tracking
 let autoplaying=false;
+let twoPlayerMode = false;
 
 function autoplay(){
     if(!autoplaying){auto=setInterval(function(){
@@ -101,8 +102,9 @@ document.addEventListener("keydown", function(event){
 const names = [];
 
 function twonames() {
-    let Element = document.querySelector(".names");
-    let name = Element.value.trim();
+    let inputElement = document.querySelector(".nameInput");
+    let playerNamesDiv = document.querySelector(".playerNames");
+    let name = inputElement.value.trim();
 
     if (name === "") {
         console.log("Empty name not allowed");
@@ -119,13 +121,123 @@ function twonames() {
 
     // Update placeholders dynamically
     if (names.length === 1) {
-        Element.placeholder = "Enter Player 2 name";
+        inputElement.placeholder = "Enter Player 2 name";
     } else if (names.length === 2) {
-        Element.style.display = "none"; // Hide input after two names
+        inputElement.style.display = "none"; // Hide input after two names
     }
 
-    Element.value = "";
+    inputElement.value = ""; // Clear input
+    playerNamesDiv.innerHTML = `<strong>Players:</strong> ${names[0]} & ${names[1]}`; // Show entered names
 }
+
+function twoplayer() {
+    if (names.length < 2) {
+        alert("Please enter two player names first!");
+        return;
+    }
+
+    if (twoPlayerMode) {
+        exitTwoPlayerMode();  // Call function to disable Two Player Mode
+    } else {
+        twoPlayerMode = true;
+        console.log("Two Player Mode Activated");
+        alert("Two Player Mode Activated! Use prompts for moves.");
+    }
+}
+
+function exitTwoPlayerMode() {
+    twoPlayerMode = false;
+    console.log("Two Player Mode Deactivated");
+    alert("Two Player Mode Deactivated! You can now play against the computer.");
+}
+
+let player1Move = null;
+let player2Move = null;
+let player1Score = 0;
+let player2Score = 0;
+let autoScore = localStorage.getItem("score") ? parseInt(localStorage.getItem("score")) : 0;
+
+
+function game(move) {
+    if (twoPlayerMode) {
+        if (player1Move === null) {
+            player1Move = move;
+            document.querySelector(".para").innerHTML = `<strong>${names[0]}</strong> chose ${player1Move}. <br> Now it's ${names[1]}'s turn.`;
+        } else {
+            player2Move = move;
+
+            // Determine winner
+            let resultMessage = "";
+            if (player1Move === player2Move) {
+                resultMessage = "It's a Tie!";
+            } else if (
+                (player1Move === "rock" && player2Move === "scissor") ||
+                (player1Move === "paper" && player2Move === "rock") ||
+                (player1Move === "scissor" && player2Move === "paper")
+            ) {
+                resultMessage = `${names[0]} Wins!`;
+                player1Score++;
+            } else {
+                resultMessage = `${names[1]} Wins!`;
+                player2Score++;
+            }
+
+            // Display result with names and images
+            document.querySelector(".para").innerHTML = `
+                <strong>${names[0]}</strong> chose ${moveImages[player1Move]} | 
+                <strong>${names[1]}</strong> chose ${moveImages[player2Move]} <br> 
+                <strong>${resultMessage}</strong> <br>
+                <strong>${names[0]}'s Score:</strong> ${player1Score} | 
+                <strong>${names[1]}'s Score:</strong> ${player2Score}
+            `;
+
+            // Reset moves for next round
+            player1Move = null;
+            player2Move = null;
+        }
+        return; // Stop execution for single-player mode
+    }
+
+    // 🎮 Single Player Mode (vs Computer)
+    let computerMove = getRandomMove();
+
+    let resultMessage = "It's a Tie!";
+    if (
+        (move === "rock" && computerMove === "scissor") ||
+        (move === "paper" && computerMove === "rock") ||
+        (move === "scissor" && computerMove === "paper")
+    ) {
+        resultMessage = `${names[0]} Wins!`;
+        autoScore++;
+    } else if (move !== computerMove) {
+        resultMessage = "Computer Wins!";
+        autoScore--;
+    }
+
+    // Update local storage for single-player mode
+    localStorage.setItem("score", autoScore);
+
+    // Display results with names and images
+    document.querySelector(".para").innerHTML = `
+        <strong>${names[0]}'s Move:</strong> ${moveImages[move]} | 
+        <strong>Computer's Move:</strong> ${moveImages[computerMove]} <br> 
+        <strong>${resultMessage}</strong> <br>
+        <strong>${names[0]}'s Score:</strong> ${autoScore}
+    `;
+}
+
+// Function to get a random move (for computer)
+function getRandomMove() {
+    const moves = ["rock", "paper", "scissor"];
+    return moves[Math.floor(Math.random() * moves.length)];
+}
+
+// Move images mapping
+const moveImages = {
+    rock: '<img src="rock-icon-png.png" class="image">',
+    paper: '<img src="paper-icon-png.png" class="image">',
+    scissor: '<img src="scissors-icon-png.png" class="image">'
+};
 
 function twoplayer() {
     if (names.length < 2) {
@@ -136,5 +248,18 @@ function twoplayer() {
     document.querySelector(".player1").textContent = names[0];
     document.querySelector(".player2").textContent = names[1];
 
+    twoPlayerMode = true;
     console.log("Two Player Mode Activated");
+}
+
+function restart() {
+    if (twoPlayerMode) {
+        player1Score = 0;
+        player2Score = 0;
+    } else {
+        autoScore = 0;
+        localStorage.setItem("score", autoScore);
+    }
+
+    document.querySelector(".para").innerHTML = "Your move: - | Opponent move: - | Score: 0";
 }

@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>First Website</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="rock,paper,scissor.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    </head>    
+<body>
+    <input class="names" placeholder="names">
+    <button onclick="twonames(); return false;" style="display: flex;   margin-right: 100px; margin-bottom: 100px;">Enter</button>
+    <div class="names"></div>
+    <button class="style" onclick="game('rock')"><img class="image" src="rock-icon-png.png" alt="">rock</button>
+    <button class="style" onclick="game('paper')"><img class="image" src="paper-icon-png.png" alt="">paper</button>
+    <button class="style" onclick="game('scissor')"><img class="image" src="scissors-icon-png.png" alt="">scissor</button>    
+    <p class="para">
+        <span class="player1">Your</span> move: - | 
+        <span class="player2">Computer</span> move: - | 
+        Score: 0
+    </p>
+    <button class="style" onclick="restart()">restart</button>
+    <button class="style" onclick="autoplay()">autoplay</button>
+    <button onclick="twoplayer()">Two Player Mode</button>
+    <script src="rock,paper,scissor.js"></script>
+</body>
+</html>
